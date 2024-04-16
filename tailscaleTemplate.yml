@@ -4,7 +4,7 @@
 parameters:
   - name: oauth-client-id
     displayName: 'Your Tailscale OAuth Client ID.'
-  - name: oauth-secret
+  - name: oauth_secret
     displayName: 'Your Tailscale OAuth Client Secret.'
   - name: tags
     displayName: 'Comma separated list of Tags to be applied to nodes. The OAuth client must have permission to apply these tags.'
@@ -17,7 +17,7 @@ parameters:
   - name: args
     displayName: 'Optional additional arguments to `tailscale up`'
     default: ''
-  - name: tailscaled-args
+  - name: tailscaled_args
     displayName: 'Optional additional arguments to `tailscaled`'
     default: ''
   - name: hostname
@@ -34,7 +34,7 @@ steps:
         exit 1
   - task: Bash@3
     displayName: Check Auth Info Empty
-    condition: or(eq(${{parameters.oauth-secret}}, ""), eq( ${{parameters.tags}}, "") )
+    condition: or(eq('${{parameters.oauth_secret}}', ""), eq( '${{parameters.tags}}', "") )
     inputs:
       script: |
         echo "::error title=⛔ error hint::OAuth identity empty, Maybe you need to populate it in the Secrets for your workflow, see more in https://docs.github.com/en/actions/security-guides/encrypted-secrets and https://tailscale.com/s/oauth-clients"
@@ -76,9 +76,8 @@ steps:
         sudo mv "${TSPATH}/tailscale" "${TSPATH}/tailscaled" /usr/bin
   - task: Bash@3
     displayName: Start Tailscale Daemon
-
     env:
-      ADDITIONAL_DAEMON_ARGS: ${{ parameters.tailscaled-args }}
+      ADDITIONAL_DAEMON_ARGS: ${{ parameters.tailscaled_args }}
     inputs:
       script: |
         sudo -E tailscaled --state=mem: ${ADDITIONAL_DAEMON_ARGS} 2>~/tailscaled.log &
@@ -88,7 +87,6 @@ steps:
         sudo -E tailscale status --json >/dev/null
   - task: Bash@3
     displayName: Connect to Tailscale
-
     env:
       TAILSCALE_AUTHKEY: ${{ parameters.authkey }}
       ADDITIONAL_ARGS: ${{ parameters.args }}
@@ -98,8 +96,8 @@ steps:
         if [ -z "${HOSTNAME}" ]; then
           HOSTNAME="github-$(cat /etc/hostname)"
         fi
-        if [ -n "${{ parameters.oauth-secret }}" ]; then
-          TAILSCALE_AUTHKEY="${{ parameters.oauth-secret }}?preauthorized=true&ephemeral=true"
+        if [ -n "${{ parameters.oauth_secret }}" ]; then
+          TAILSCALE_AUTHKEY="${{ parameters.oauth_secret }}?preauthorized=true&ephemeral=true"
           TAGS_ARG="--advertise-tags=${{ parameters.tags }}"
         fi
         timeout 5m sudo -E tailscale up ${TAGS_ARG} --authkey=${TAILSCALE_AUTHKEY} --hostname=${HOSTNAME} --accept-routes ${ADDITIONAL_ARGS}
