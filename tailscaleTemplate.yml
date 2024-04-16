@@ -27,7 +27,7 @@ parameters:
 steps:
   - task: Bash@3
     displayName: Check Runner OS
-    condition: ne($(Agent.OS), 'Linux')
+    condition: ne(${{ variables['Agent.OS'] }}, 'Linux')
     inputs:
       script: |
         echo "::error title=⛔ error hint::Support Linux Only"
@@ -98,5 +98,5 @@ steps:
 
         TAILSCALE_AUTHKEY="${{ parameters.oauth_secret }}?preauthorized=true&ephemeral=true"
         TAGS_ARG="--advertise-tags=${{ parameters.tags }}"
-        
+
         timeout 5m sudo -E tailscale up ${TAGS_ARG} --authkey=${TAILSCALE_AUTHKEY} --hostname=${HOSTNAME} --accept-routes ${ADDITIONAL_ARGS}
