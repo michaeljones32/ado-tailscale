@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #
 parameters:
-  - name: oauth-client-id
+  - name: oauth_client_id
     displayName: 'Your Tailscale OAuth Client ID.'
   - name: oauth_secret
     displayName: 'Your Tailscale OAuth Client Secret.'
