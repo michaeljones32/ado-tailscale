@@ -27,7 +27,7 @@ parameters:
 steps:
   - task: Bash@3
     displayName: Check Runner OS
-    condition: ne(${{ variables['Agent.OS'] }}, 'Linux')
+    condition: ne(variables['Agent.OS'], 'Linux')
     inputs:
       script: |
         echo "::error title=⛔ error hint::Support Linux Only"
