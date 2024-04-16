@@ -88,7 +88,6 @@ steps:
   - task: Bash@3
     displayName: Connect to Tailscale
     env:
-      TAILSCALE_AUTHKEY: ${{ parameters.authkey }}
       ADDITIONAL_ARGS: ${{ parameters.args }}
       HOSTNAME: ${{ parameters.hostname }}
     inputs:
@@ -96,8 +95,8 @@ steps:
         if [ -z "${HOSTNAME}" ]; then
           HOSTNAME="github-$(cat /etc/hostname)"
         fi
-        if [ -n "${{ parameters.oauth_secret }}" ]; then
-          TAILSCALE_AUTHKEY="${{ parameters.oauth_secret }}?preauthorized=true&ephemeral=true"
-          TAGS_ARG="--advertise-tags=${{ parameters.tags }}"
-        fi
+
+        TAILSCALE_AUTHKEY="${{ parameters.oauth_secret }}?preauthorized=true&ephemeral=true"
+        TAGS_ARG="--advertise-tags=${{ parameters.tags }}"
+        
         timeout 5m sudo -E tailscale up ${TAGS_ARG} --authkey=${TAILSCALE_AUTHKEY} --hostname=${HOSTNAME} --accept-routes ${ADDITIONAL_ARGS}
